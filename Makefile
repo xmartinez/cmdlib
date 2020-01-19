@@ -1,6 +1,6 @@
 .PHONY: init
 init:
-	poetry install
+	poetry env use python3.7 && poetry install
 
 .PHONY: test
 test:
