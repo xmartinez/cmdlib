@@ -2,19 +2,27 @@ from __future__ import annotations
 
 import subprocess
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
-def Cmd(program, *args: str) -> Command:
-    return Command(args=[program] + list(args))
+def Cmd(program, *args: str, **kw: str) -> Command:
+    return Command(args=[program])(*args, **kw)
+
+
+def _item_as_option(k: str, v: Union[bool, str]) -> str:
+    k = k.replace("_", "-")
+    return f"--{k}" if v is True else f"--{k}={v}"
 
 
 @dataclass
 class Command:
     args: List[str]
 
-    def __call__(self, *args: str) -> Command:
-        return Command(args=self.args + list(args))
+    def __call__(self, *args: str, **kw: Union[bool, str]) -> Command:
+        new_args = self.args[:]
+        new_args.extend(args)
+        new_args.extend(_item_as_option(k, v) for k, v in kw.items())
+        return Command(args=new_args)
 
     def run(self) -> ExitStatus:
         p = subprocess.run(self.args)

@@ -33,6 +33,21 @@ def test_args_chaining_does_not_mutate():
     assert cp_verbose.args == ["cp", "--verbose"]
 
 
+def test_kwargs_options():
+    cmd = Cmd("cp")(target_directory="..")
+    assert cmd.args == ["cp", "--target-directory=.."]
+
+
+def test_kwargs_bool_to_option_flag():
+    cmd = Cmd("cp")(verbose=True)
+    assert cmd.args == ["cp", "--verbose"]
+
+
 def test_cmd_args():
     ls = Cmd("ls", "--recursive", "--size")
     assert ls.args == ["ls", "--recursive", "--size"]
+
+
+def test_cmd_kwargs():
+    ls = Cmd("ls", "dir1", color="never")
+    assert ls.args == ["ls", "dir1", "--color=never"]
