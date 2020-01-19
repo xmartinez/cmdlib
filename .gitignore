@@ -1,0 +1,14 @@
+.DS_Store
+.coverage
+.dmypy.json
+.eggs
+.idea
+.tox
+.vscode
+/*.egg-info
+__pycache__
+_build
+build/
+dist/
+pip-wheel-metadata/
+poetry.lock
