@@ -31,3 +31,8 @@ def test_args_chaining_does_not_mutate():
     cp_verbose = cp("--verbose")  # This should not mutate `cp`.
     assert cp.args == ["cp"]
     assert cp_verbose.args == ["cp", "--verbose"]
+
+
+def test_cmd_args():
+    ls = Cmd("ls", "--recursive", "--size")
+    assert ls.args == ["ls", "--recursive", "--size"]

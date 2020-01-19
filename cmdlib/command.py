@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 
-def Cmd(program):
-    return Command(args=[program])
+def Cmd(program, *args: str) -> Command:
+    return Command(args=[program] + list(args))
 
 
 @dataclass
