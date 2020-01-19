@@ -13,3 +13,21 @@ def test_run_status():
     status = Cmd("false").run()
     assert not status.success()
     assert status.code == 1
+
+
+def test_args_chaining():
+    cmd = Cmd("cp")
+    assert cmd.args == ["cp"]
+
+    cmd = cmd("src.txt", "dst.txt")
+    assert cmd.args == ["cp", "src.txt", "dst.txt"]
+
+    cmd = Cmd("ls")("--all")("dir1", "dir2")
+    assert cmd.args == ["ls", "--all", "dir1", "dir2"]
+
+
+def test_args_chaining_does_not_mutate():
+    cp = Cmd("cp")
+    cp_verbose = cp("--verbose")  # This should not mutate `cp`.
+    assert cp.args == ["cp"]
+    assert cp_verbose.args == ["cp", "--verbose"]

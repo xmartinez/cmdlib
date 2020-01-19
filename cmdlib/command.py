@@ -13,6 +13,9 @@ def Cmd(program):
 class Command:
     args: List[str]
 
+    def __call__(self, *args: str) -> Command:
+        return Command(args=self.args + list(args))
+
     def run(self) -> ExitStatus:
         p = subprocess.run(self.args)
         return ExitStatus(p.returncode)
