@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from typing import List, Optional, Union
 
 
+class CommandError(Exception):
+    pass
+
+
 def Cmd(program, *args: str, **kw: str) -> Command:
     return Command(args=[program])(*args, **kw)
 
@@ -24,8 +28,10 @@ class Command:
         new_args.extend(_item_as_option(k, v) for k, v in kw.items())
         return Command(args=new_args)
 
-    def run(self) -> ExitStatus:
+    def run(self, check=True) -> ExitStatus:
         p = subprocess.run(self.args)
+        if check and p.returncode != 0:
+            raise CommandError()
         return ExitStatus(p.returncode)
 
 

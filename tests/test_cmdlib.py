@@ -1,4 +1,8 @@
-from cmdlib import __version__, Cmd
+"""cmdlib test suite."""
+
+import pytest
+
+from cmdlib import __version__, Cmd, CommandError
 
 
 def test_version():
@@ -10,9 +14,14 @@ def test_run_status():
     assert status.success()
     assert status.code == 0
 
-    status = Cmd("false").run()
+    status = Cmd("false").run(check=False)
     assert not status.success()
     assert status.code == 1
+
+
+def test_run_raises():
+    with pytest.raises(CommandError):
+        Cmd("false").run()
 
 
 def test_args_chaining():
