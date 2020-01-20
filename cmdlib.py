@@ -4,7 +4,7 @@ import subprocess
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 class CommandError(Exception):
