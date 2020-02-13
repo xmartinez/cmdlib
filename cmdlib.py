@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 from dataclasses import dataclass
 from typing import List, Optional, Union
@@ -29,6 +30,12 @@ class Command:
         new_args.extend(args)
         new_args.extend(_item_as_option(k, v) for k, v in kw.items())
         return Command(args=new_args)
+
+    def json(self, check=True) -> Any:
+        p = subprocess.run(self.args, capture_output=True)
+        if check and p.returncode != 0:
+            raise CommandError()
+        return json.loads(p.stdout)
 
     def out(self, check=True) -> str:
         p = subprocess.run(self.args, capture_output=True)

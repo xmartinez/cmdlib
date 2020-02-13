@@ -62,6 +62,11 @@ def test_cmd_kwargs():
     assert ls.args == ["ls", "dir1", "--color=never"]
 
 
+def test_json():
+    out = Cmd("echo", '{"a":1,"b":2,"c":null}').json()
+    assert out == dict(a=1, b=2, c=None)
+
+
 def test_out():
     out = Cmd("echo", "some output").out()
     assert out == "some output\n"
