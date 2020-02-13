@@ -60,3 +60,8 @@ def test_cmd_args():
 def test_cmd_kwargs():
     ls = Cmd("ls", "dir1", color="never")
     assert ls.args == ["ls", "dir1", "--color=never"]
+
+
+def test_out():
+    out = Cmd("echo", "some output").out()
+    assert out == "some output\n"

@@ -30,6 +30,12 @@ class Command:
         new_args.extend(_item_as_option(k, v) for k, v in kw.items())
         return Command(args=new_args)
 
+    def out(self, check=True) -> str:
+        p = subprocess.run(self.args, capture_output=True)
+        if check and p.returncode != 0:
+            raise CommandError()
+        return p.stdout.decode()
+
     def run(self, check=True) -> ExitStatus:
         p = subprocess.run(self.args)
         if check and p.returncode != 0:
