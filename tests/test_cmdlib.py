@@ -72,6 +72,11 @@ def test_json():
     assert out == dict(a=1, b=2, c=None)
 
 
+def test_json_raises():
+    with pytest.raises(CommandError):
+        Cmd("false").json()
+
+
 def test_out():
     out = Cmd("echo", "some output").out()
     assert out == "some output\n"

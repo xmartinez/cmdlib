@@ -36,10 +36,7 @@ class Command:
         return " ".join(map(shlex.quote, self.args))
 
     def json(self, check=True) -> Any:
-        p = subprocess.run(self.args, capture_output=True)
-        if check and p.returncode != 0:
-            raise CommandError()
-        return json.loads(p.stdout)
+        return json.loads(self.out())
 
     def out(self, check=True) -> str:
         p = subprocess.run(self.args, capture_output=True)
