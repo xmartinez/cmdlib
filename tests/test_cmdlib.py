@@ -8,11 +8,11 @@ import pytest
 from cmdlib import __version__, Cmd, CommandError, ExitStatus
 
 
-def test_version():
+def test_version() -> None:
     assert __version__ == "0.3.0"
 
 
-def test_run_status():
+def test_run_status() -> None:
     status = Cmd("true").run()
     assert status.success()
     assert status.code == 0
@@ -22,12 +22,12 @@ def test_run_status():
     assert status.code == 1
 
 
-def test_run_raises():
+def test_run_raises() -> None:
     with pytest.raises(CommandError):
         Cmd("false").run()
 
 
-def test_command_error_captures_output():
+def test_command_error_captures_output() -> None:
     script = "\n".join(
         [
             "import sys",
@@ -47,7 +47,7 @@ def test_command_error_captures_output():
     assert exc.stderr == "stderr message\n"
 
 
-def test_command_error_format():
+def test_command_error_format() -> None:
     cmd = Cmd("echo")("some arg")
     exc = CommandError(command=cmd, status=ExitStatus(status=42))
     message = list(traceback.format_exception_only(type(exc), exc))
@@ -56,7 +56,7 @@ def test_command_error_format():
     ]
 
 
-def test_command_error_format_long():
+def test_command_error_format_long() -> None:
     cmd = Cmd("grep")(fixed_strings=True, recursive=True)("needle", ".")
     exc = CommandError(
         command=cmd,
@@ -87,12 +87,12 @@ def test_command_error_format_long():
     )
 
 
-def test_command_str_quoted():
+def test_command_str_quoted() -> None:
     cmd = Cmd("echo")("some arg")
     assert str(cmd) == r"echo 'some arg'"
 
 
-def test_args_chaining():
+def test_args_chaining() -> None:
     cmd = Cmd("cp")
     assert cmd.args == ["cp"]
 
@@ -103,43 +103,43 @@ def test_args_chaining():
     assert cmd.args == ["ls", "--all", "dir1", "dir2"]
 
 
-def test_args_chaining_does_not_mutate():
+def test_args_chaining_does_not_mutate() -> None:
     cp = Cmd("cp")
     cp_verbose = cp("--verbose")  # This should not mutate `cp`.
     assert cp.args == ["cp"]
     assert cp_verbose.args == ["cp", "--verbose"]
 
 
-def test_kwargs_options():
+def test_kwargs_options() -> None:
     cmd = Cmd("cp")(target_directory="..")
     assert cmd.args == ["cp", "--target-directory=.."]
 
 
-def test_kwargs_bool_to_option_flag():
+def test_kwargs_bool_to_option_flag() -> None:
     cmd = Cmd("cp")(verbose=True)
     assert cmd.args == ["cp", "--verbose"]
 
 
-def test_cmd_args():
+def test_cmd_args() -> None:
     ls = Cmd("ls", "--recursive", "--size")
     assert ls.args == ["ls", "--recursive", "--size"]
 
 
-def test_cmd_kwargs():
+def test_cmd_kwargs() -> None:
     ls = Cmd("ls", "dir1", color="never")
     assert ls.args == ["ls", "dir1", "--color=never"]
 
 
-def test_json():
+def test_json() -> None:
     out = Cmd("echo", '{"a":1,"b":2,"c":null}').json()
     assert out == dict(a=1, b=2, c=None)
 
 
-def test_json_raises():
+def test_json_raises() -> None:
     with pytest.raises(CommandError):
         Cmd("false").json()
 
 
-def test_out():
+def test_out() -> None:
     out = Cmd("echo", "some output").out()
     assert out == "some output\n"

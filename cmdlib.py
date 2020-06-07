@@ -5,7 +5,7 @@ import shlex
 import subprocess
 from dataclasses import dataclass
 from textwrap import indent
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 __version__ = "0.3.0"
 
@@ -15,8 +15,8 @@ class CommandError(Exception):
         self,
         command: Command,
         status: ExitStatus,
-        stdout: str = None,
-        stderr: str = None,
+        stdout: Optional[str] = None,
+        stderr: Optional[str] = None,
     ):
         self.command = str(command)
         self.status = status
@@ -24,7 +24,7 @@ class CommandError(Exception):
         self.stderr = stderr
 
     def _format_output(self, prefix: str, output: Optional[str]) -> str:
-        if not self.stdout:
+        if not output:
             return ""
         formatted = indent(output.rstrip("\n"), "  ")
         return f"\n{prefix}\n\n{formatted}\n"
@@ -45,7 +45,7 @@ class CommandError(Exception):
         )
 
 
-def Cmd(program, *args: str, **kw: str) -> Command:
+def Cmd(program: str, *args: str, **kw: str) -> Command:
     return Command(args=[program])(*args, **kw)
 
 
@@ -67,10 +67,10 @@ class Command:
     def __str__(self) -> str:
         return " ".join(map(shlex.quote, self.args))
 
-    def json(self, check=True) -> Any:
+    def json(self, check: bool = True) -> Any:
         return json.loads(self.out())
 
-    def out(self, check=True) -> str:
+    def out(self, check: bool = True) -> str:
         p = subprocess.run(self.args, capture_output=True)
         status = ExitStatus(status=p.returncode)
         if check and not status.success():
@@ -82,7 +82,7 @@ class Command:
             )
         return p.stdout.decode()
 
-    def run(self, check=True) -> ExitStatus:
+    def run(self, check: bool = True) -> ExitStatus:
         p = subprocess.run(self.args)
         status = ExitStatus(status=p.returncode)
         if check and not status.success():
