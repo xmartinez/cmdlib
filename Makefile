@@ -28,9 +28,16 @@ venv: .venv/updated
 ################################################################################
 # Dev targets.
 
-.PHONY: check
-check: venv
+.PHONY: check-fmt
+check-fmt: venv
+	poetry run black --check --quiet .
+
+.PHONY: check-types
+check-types: venv
 	poetry run mypy . && cat .mypy_report/linecount.txt
+
+.PHONY: check
+check: check-fmt check-types
 
 .PHONY: test
 test: venv check
