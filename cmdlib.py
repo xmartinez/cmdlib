@@ -4,13 +4,45 @@ import json
 import shlex
 import subprocess
 from dataclasses import dataclass
+from textwrap import indent
 from typing import List, Optional, Union
 
 __version__ = "0.3.0"
 
 
 class CommandError(Exception):
-    pass
+    def __init__(
+        self,
+        command: Command,
+        status: ExitStatus,
+        stdout: str = None,
+        stderr: str = None,
+    ):
+        self.command = str(command)
+        self.status = status
+        self.stdout = stdout
+        self.stderr = stderr
+
+    def _format_output(self, prefix: str, output: Optional[str]) -> str:
+        if not self.stdout:
+            return ""
+        formatted = indent(output.rstrip("\n"), "  ")
+        return f"\n{prefix}\n\n{formatted}\n"
+
+    def _format_command(self) -> str:
+        cmd = str(self.command)
+        if len(cmd) < 22 and not "\n" in cmd:
+            return f" {cmd}"
+        formatted = indent(cmd.rstrip("\n"), "  ")
+        return f"\n\n{formatted}\n"
+
+    def __str__(self) -> str:
+        return (
+            f"command exited with non-zero status code {self.status.code}:"
+            f"{self._format_command()}"
+            f"{self._format_output('Stdout:', self.stdout)}"
+            f"{self._format_output('Stderr:', self.stderr)}"
+        )
 
 
 def Cmd(program, *args: str, **kw: str) -> Command:
@@ -40,14 +72,21 @@ class Command:
 
     def out(self, check=True) -> str:
         p = subprocess.run(self.args, capture_output=True)
-        if check and p.returncode != 0:
-            raise CommandError()
+        status = ExitStatus(status=p.returncode)
+        if check and not status.success():
+            raise CommandError(
+                command=self,
+                status=status,
+                stdout=p.stdout.decode(),
+                stderr=p.stderr.decode(),
+            )
         return p.stdout.decode()
 
     def run(self, check=True) -> ExitStatus:
         p = subprocess.run(self.args)
-        if check and p.returncode != 0:
-            raise CommandError()
+        status = ExitStatus(status=p.returncode)
+        if check and not status.success():
+            raise CommandError(command=self, status=status)
         return ExitStatus(p.returncode)
 
 

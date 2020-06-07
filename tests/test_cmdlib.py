@@ -1,8 +1,11 @@
 """cmdlib test suite."""
 
+import traceback
+from textwrap import dedent
+
 import pytest
 
-from cmdlib import __version__, Cmd, CommandError
+from cmdlib import __version__, Cmd, CommandError, ExitStatus
 
 
 def test_version():
@@ -22,6 +25,66 @@ def test_run_status():
 def test_run_raises():
     with pytest.raises(CommandError):
         Cmd("false").run()
+
+
+def test_command_error_captures_output():
+    script = "\n".join(
+        [
+            "import sys",
+            "print('stdout message')",
+            "print('stderr message', file=sys.stderr)",
+            "sys.exit(42)",
+        ]
+    )
+    with pytest.raises(CommandError) as err:
+        Cmd("python3")("-c", script).out()
+
+    traceback.print_exception(err.type, err.value, err.tb)
+    exc = err.value
+    assert exc.status.code == 42
+    assert exc.command.startswith("python3 -c '")
+    assert exc.stdout == "stdout message\n"
+    assert exc.stderr == "stderr message\n"
+
+
+def test_command_error_format():
+    cmd = Cmd("echo")("some arg")
+    exc = CommandError(command=cmd, status=ExitStatus(status=42))
+    message = list(traceback.format_exception_only(type(exc), exc))
+    assert message == [
+        "cmdlib.CommandError: command exited with non-zero status code 42: echo 'some arg'\n"
+    ]
+
+
+def test_command_error_format_long():
+    cmd = Cmd("grep")(fixed_strings=True, recursive=True)("needle", ".")
+    exc = CommandError(
+        command=cmd,
+        status=ExitStatus(status=2),
+        stdout="Stdout message.\nMore stdout.\n",
+        stderr="Stderr message.\nMore stderr.\n",
+    )
+    message = list(traceback.format_exception_only(type(exc), exc))
+    print("".join(message))
+    assert message[0].strip() == (
+        dedent(
+            """
+            cmdlib.CommandError: command exited with non-zero status code 2:
+
+              grep --fixed-strings --recursive needle .
+
+            Stdout:
+
+              Stdout message.
+              More stdout.
+
+            Stderr:
+
+              Stderr message.
+              More stderr.
+            """
+        ).strip()
+    )
 
 
 def test_command_str_quoted():
