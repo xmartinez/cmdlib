@@ -28,8 +28,12 @@ venv: .venv/updated
 ################################################################################
 # Dev targets.
 
+.PHONY: check
+check: venv
+	poetry run mypy . && cat .mypy_report/linecount.txt
+
 .PHONY: test
-test: venv
+test: venv check
 	poetry run pytest --cov=cmdlib --quiet $(PYTEST_ARGS) tests/
 
 .PHONY: build
