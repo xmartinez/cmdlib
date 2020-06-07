@@ -24,6 +24,11 @@ def test_run_raises():
         Cmd("false").run()
 
 
+def test_command_str_quoted():
+    cmd = Cmd("echo")("some arg")
+    assert str(cmd) == r"echo 'some arg'"
+
+
 def test_args_chaining():
     cmd = Cmd("cp")
     assert cmd.args == ["cp"]
