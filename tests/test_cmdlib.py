@@ -52,7 +52,8 @@ def test_command_error_format() -> None:
     exc = CommandError(command=cmd, status=ExitStatus(status=42))
     message = list(traceback.format_exception_only(type(exc), exc))
     assert message == [
-        "cmdlib.CommandError: command exited with non-zero status code 42: echo 'some arg'\n"
+        "cmdlib.CommandError: command exited with non-zero status code 42: "
+        "echo 'some arg'\n"
     ]
 
 

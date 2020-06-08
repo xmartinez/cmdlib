@@ -31,7 +31,7 @@ class CommandError(Exception):
 
     def _format_command(self) -> str:
         cmd = str(self.command)
-        if len(cmd) < 22 and not "\n" in cmd:
+        if len(cmd) < 22 and "\n" not in cmd:
             return f" {cmd}"
         formatted = indent(cmd.rstrip("\n"), "  ")
         return f"\n\n{formatted}\n"
