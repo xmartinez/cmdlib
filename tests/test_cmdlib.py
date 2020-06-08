@@ -9,7 +9,7 @@ from cmdlib import __version__, Cmd, CommandError, ExitStatus
 
 
 def test_version() -> None:
-    assert __version__ == "0.3.0"
+    assert __version__ == "0.4.0"
 
 
 def test_run_status() -> None:
