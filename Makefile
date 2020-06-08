@@ -44,7 +44,7 @@ lint: venv
 check: check-fmt check-types lint
 
 .PHONY: test
-test: venv check
+test: venv
 	poetry run pytest --cov=cmdlib --quiet $(PYTEST_ARGS) tests/
 
 .PHONY: build
