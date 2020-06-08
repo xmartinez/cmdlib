@@ -21,6 +21,12 @@ jobs:
     - name: Environment
       run: env | sort
 
+    - name: Install poetry
+      shell: bash
+      run:
+        scripts/install-poetry.sh $HOME/.poetry 1.0.5 linux
+        echo "::add-path::$HOME/.poetry/bin"
+
     - name: Install dependencies
       run: make venv
 
