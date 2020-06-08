@@ -36,8 +36,12 @@ check-fmt: venv
 check-types: venv
 	poetry run mypy . && cat .mypy_report/linecount.txt
 
+.PHONY: lint
+lint: venv
+	poetry run flake8 --exclude=.venv
+
 .PHONY: check
-check: check-fmt check-types
+check: check-fmt check-types lint
 
 .PHONY: test
 test: venv check
