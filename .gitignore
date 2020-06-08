@@ -13,4 +13,3 @@ _build
 build/
 dist/
 pip-wheel-metadata/
-poetry.lock
