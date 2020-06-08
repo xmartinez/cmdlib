@@ -18,17 +18,17 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Environment
-      run: env | sort
-
     - name: Install poetry
       shell: bash
-      run:
+      run: |
         scripts/install-poetry.sh $HOME/.poetry 1.0.5 linux
         echo "::add-path::$HOME/.poetry/bin"
 
+    - name: Environment
+      run: env | sort
+
     - name: Install dependencies
-      run: make venv
+      run: make --assume-old=poetry.lock venv
 
     - name: Lint
       run: make check
