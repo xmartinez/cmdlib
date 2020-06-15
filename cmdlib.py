@@ -6,7 +6,7 @@ import shlex
 import subprocess
 from dataclasses import dataclass
 from textwrap import indent
-from typing import Any, List, Optional, Union
+from typing import Any, List, NoReturn, Optional, Union
 
 __version__ = "0.5.0"
 
@@ -68,7 +68,7 @@ class Command:
     def __str__(self) -> str:
         return " ".join(map(shlex.quote, self.args))
 
-    def exec(self):
+    def exec(self) -> NoReturn:
         os.execvp(self.args[0], self.args)
 
     def json(self, check: bool = True) -> Any:
