@@ -7,7 +7,7 @@ default: test
 # Virtual environment.
 
 poetry.lock: pyproject.toml
-	poetry lock
+	poetry lock && touch $@
 
 # Manually create virtual environment, to ensure that we use a recent
 # `pip` and `setuptools` version.
