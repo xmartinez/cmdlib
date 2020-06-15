@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from textwrap import indent
 from typing import Any, List, NoReturn, Optional, Union
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 
 class CommandError(Exception):
