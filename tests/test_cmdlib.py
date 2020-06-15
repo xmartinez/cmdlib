@@ -12,6 +12,12 @@ def test_version() -> None:
     assert __version__ == "0.4.0"
 
 
+def test_exec() -> None:
+    script = "\n".join(["import cmdlib", "cmdlib.Cmd('echo', 'arg1', 'arg2').exec()"])
+    output = Cmd("python3")("-c", script).out()
+    assert output == "arg1 arg2\n"
+
+
 def test_run_status() -> None:
     status = Cmd("true").run()
     assert status.success()

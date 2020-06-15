@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shlex
 import subprocess
 from dataclasses import dataclass
@@ -66,6 +67,9 @@ class Command:
 
     def __str__(self) -> str:
         return " ".join(map(shlex.quote, self.args))
+
+    def exec(self):
+        os.execvp(self.args[0], self.args)
 
     def json(self, check: bool = True) -> Any:
         return json.loads(self.out())
