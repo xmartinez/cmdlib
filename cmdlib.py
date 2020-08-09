@@ -3,12 +3,24 @@ from __future__ import annotations
 import json
 import os
 import shlex
+import signal
 import subprocess
 from dataclasses import dataclass
 from textwrap import indent
 from typing import Any, List, NoReturn, Optional, Union
 
 __version__ = "0.5.1"
+
+
+def _restore_signals() -> None:
+    sig_restore = {"SIGPIPE", "SIGXFZ", "SIGXFSZ"}
+    sigset = {
+        signal.Signals[name]
+        for name in sig_restore
+        if name in signal.Signals.__members__
+    }
+    for signum in sigset:
+        signal.signal(signum, signal.SIG_DFL)
 
 
 class CommandError(Exception):
@@ -69,6 +81,14 @@ class Command:
         return " ".join(map(shlex.quote, self.args))
 
     def exec(self) -> NoReturn:
+        # Restore signals that the Python interpreter has called SIG_IGN on to SIG_DFL.
+        #
+        # Note that `subprocess.run()` already does this internally
+        # (`restore_signals=True`), so all spawn-like methods (`json()`, `out()`,
+        # `run()`) also reset signals before `exec`.
+        #
+        _restore_signals()
+
         os.execvp(self.args[0], self.args)
 
     def json(self, check: bool = True) -> Any:
