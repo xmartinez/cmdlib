@@ -14,7 +14,7 @@ poetry.lock: pyproject.toml
 #
 # See: https://github.com/python-poetry/poetry/issues/732
 .venv/created:
-	python3.7 -m venv .venv && \
+	python3 -m venv .venv && \
 	.venv/bin/python -m pip install --upgrade pip setuptools && \
 	touch $@
 
