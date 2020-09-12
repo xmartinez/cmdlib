@@ -13,9 +13,11 @@ __version__ = "0.5.1"
 
 
 if TYPE_CHECKING:
-    StrPath = Union[str, os.PathLike[str]]
+    PathLike = os.PathLike[str]
 else:
-    StrPath = Union[str, os.PathLike]
+    PathLike = os.PathLike
+
+StrPath = Union[str, PathLike]
 
 
 def _restore_signals() -> None:
@@ -76,15 +78,20 @@ def _item_as_option(k: str, v: Union[bool, str]) -> str:
 @dataclass
 class Command:
     args: List[StrPath]
+    cwd: Optional[PathLike] = None
 
     def __call__(self, *args: StrPath, **kw: Union[bool, str]) -> Command:
         new_args = self.args[:]
         new_args.extend(args)
         new_args.extend(_item_as_option(k, v) for k, v in kw.items())
-        return Command(args=new_args)
+        return Command(args=new_args, cwd=self.cwd)
 
     def __str__(self) -> str:
         return " ".join(map(shlex.quote, [os.fspath(arg) for arg in self.args]))
+
+    def current_dir(self, path: PathLike) -> Command:
+        self.cwd = path
+        return self
 
     def exec(self) -> NoReturn:
         # Restore signals that the Python interpreter has called SIG_IGN on to SIG_DFL.
@@ -95,6 +102,8 @@ class Command:
         #
         _restore_signals()
 
+        if self.cwd is not None:
+            os.chdir(self.cwd)
         os.execvp(self.args[0], [os.fspath(arg) for arg in self.args])
 
     def json(self) -> Any:
@@ -107,7 +116,7 @@ class Command:
         return self.output_bytes().decode()
 
     def output_bytes(self) -> bytes:
-        p = subprocess.run(self.args, capture_output=True)
+        p = self._run_process(capture_output=True)
         status = ExitStatus(status=p.returncode)
         if not status.success():
             raise CommandError(
@@ -118,13 +127,20 @@ class Command:
             )
         return p.stdout
 
+    def _run_process(
+        self, capture_output: bool = False
+    ) -> subprocess.CompletedProcess[bytes]:
+        return subprocess.run(
+            args=self.args, cwd=self.cwd, capture_output=capture_output
+        )
+
     def run(self) -> None:
         status = self.status()
         if not status.success():
             raise CommandError(command=self, status=status)
 
     def status(self) -> ExitStatus:
-        p = subprocess.run(self.args)
+        p = self._run_process()
         return ExitStatus(status=p.returncode)
 
 

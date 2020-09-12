@@ -4,6 +4,7 @@ import traceback
 from pathlib import Path
 from textwrap import dedent
 
+import py
 import pytest
 
 from cmdlib import __version__, Cmd, CommandError, ExitStatus
@@ -11,6 +12,15 @@ from cmdlib import __version__, Cmd, CommandError, ExitStatus
 
 def test_version() -> None:
     assert __version__ == "0.5.1"
+
+
+def test_current_dir(tmpdir: py.path.local) -> None:
+    cwd = Cmd("pwd").current_dir(tmpdir).output().rstrip()
+    assert cwd == tmpdir
+
+    # Add an argument after `current_dir()` to ensure that it is preserved.
+    cwd = Cmd("pwd").current_dir(tmpdir)("-P").output().rstrip()
+    assert cwd == tmpdir
 
 
 def test_exec() -> None:
