@@ -97,13 +97,13 @@ class Command:
 
         os.execvp(self.args[0], [os.fspath(arg) for arg in self.args])
 
-    def json(self, check: bool = True) -> Any:
+    def json(self) -> Any:
         return json.loads(self.out())
 
-    def out(self, check: bool = True) -> str:
+    def out(self) -> str:
         p = subprocess.run(self.args, capture_output=True)
         status = ExitStatus(status=p.returncode)
-        if check and not status.success():
+        if not status.success():
             raise CommandError(
                 command=self,
                 status=status,
@@ -112,10 +112,10 @@ class Command:
             )
         return p.stdout.decode()
 
-    def run(self, check: bool = True) -> ExitStatus:
+    def run(self) -> ExitStatus:
         p = subprocess.run(self.args)
         status = ExitStatus(status=p.returncode)
-        if check and not status.success():
+        if not status.success():
             raise CommandError(command=self, status=status)
         return ExitStatus(p.returncode)
 

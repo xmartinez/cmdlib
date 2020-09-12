@@ -24,10 +24,6 @@ def test_run_status() -> None:
     assert status.success()
     assert status.code == 0
 
-    status = Cmd("false").run(check=False)
-    assert not status.success()
-    assert status.code == 1
-
 
 def test_run_raises() -> None:
     with pytest.raises(CommandError):
