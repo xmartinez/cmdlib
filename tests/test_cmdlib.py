@@ -19,10 +19,8 @@ def test_exec() -> None:
     assert output == "arg1 arg2\n"
 
 
-def test_run_status() -> None:
-    status = Cmd("true").run()
-    assert status.success()
-    assert status.code == 0
+def test_run() -> None:
+    Cmd("true").run()
 
 
 def test_run_raises() -> None:
@@ -31,8 +29,7 @@ def test_run_raises() -> None:
 
 
 def test_run_path_like() -> None:
-    status = Cmd("echo")(Path(".")).run()
-    assert status.success()
+    Cmd("echo")(Path(".")).run()
 
 
 def test_command_error_captures_output() -> None:
