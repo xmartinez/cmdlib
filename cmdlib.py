@@ -119,10 +119,13 @@ class Command:
         return p.stdout
 
     def run(self) -> None:
-        p = subprocess.run(self.args)
-        status = ExitStatus(status=p.returncode)
+        status = self.status()
         if not status.success():
             raise CommandError(command=self, status=status)
+
+    def status(self) -> ExitStatus:
+        p = subprocess.run(self.args)
+        return ExitStatus(status=p.returncode)
 
 
 @dataclass

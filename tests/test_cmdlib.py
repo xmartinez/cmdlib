@@ -32,6 +32,16 @@ def test_run_path_like() -> None:
     Cmd("echo")(Path(".")).run()
 
 
+def test_status() -> None:
+    status = Cmd("true").status()
+    assert status.success()
+    assert status.code == 0
+
+    status = Cmd("false").status()
+    assert not status.success()
+    assert status.code == 1
+
+
 def test_command_error_captures_output() -> None:
     script = "\n".join(
         [
