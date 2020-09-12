@@ -90,7 +90,7 @@ class Command:
         # Restore signals that the Python interpreter has called SIG_IGN on to SIG_DFL.
         #
         # Note that `subprocess.run()` already does this internally
-        # (`restore_signals=True`), so all spawn-like methods (`json()`, `out()`,
+        # (`restore_signals=True`), so all spawn-like methods (`json()`, `output()`,
         # `run()`) also reset signals before `exec`.
         #
         _restore_signals()
@@ -101,6 +101,9 @@ class Command:
         return json.loads(self.out())
 
     def out(self) -> str:
+        return self.output()
+
+    def output(self) -> str:
         p = subprocess.run(self.args, capture_output=True)
         status = ExitStatus(status=p.returncode)
         if not status.success():

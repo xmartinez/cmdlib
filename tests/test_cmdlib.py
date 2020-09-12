@@ -155,5 +155,10 @@ def test_json_raises() -> None:
 
 
 def test_out() -> None:
-    out = Cmd("echo", "some output").out()
+    out = Cmd("echo", "some output").output()
+    assert out == "some output\n"
+
+
+def test_output() -> None:
+    out = Cmd("echo", "some output").output()
     assert out == "some output\n"
