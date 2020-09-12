@@ -162,3 +162,8 @@ def test_out() -> None:
 def test_output() -> None:
     out = Cmd("echo", "some output").output()
     assert out == "some output\n"
+
+
+def test_output_bytes() -> None:
+    out = Cmd("echo", "12345").output_bytes()
+    assert out == b"12345\n"
