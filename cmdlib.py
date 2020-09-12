@@ -7,9 +7,15 @@ import signal
 import subprocess
 from dataclasses import dataclass
 from textwrap import indent
-from typing import Any, List, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, List, NoReturn, Optional, Union
 
 __version__ = "0.5.1"
+
+
+if TYPE_CHECKING:
+    StrPath = Union[str, os.PathLike[str]]
+else:
+    StrPath = Union[str, os.PathLike]
 
 
 def _restore_signals() -> None:
@@ -58,7 +64,7 @@ class CommandError(Exception):
         )
 
 
-def Cmd(program: str, *args: str, **kw: str) -> Command:
+def Cmd(program: StrPath, *args: StrPath, **kw: str) -> Command:
     return Command(args=[program])(*args, **kw)
 
 
@@ -69,16 +75,16 @@ def _item_as_option(k: str, v: Union[bool, str]) -> str:
 
 @dataclass
 class Command:
-    args: List[str]
+    args: List[StrPath]
 
-    def __call__(self, *args: str, **kw: Union[bool, str]) -> Command:
+    def __call__(self, *args: StrPath, **kw: Union[bool, str]) -> Command:
         new_args = self.args[:]
         new_args.extend(args)
         new_args.extend(_item_as_option(k, v) for k, v in kw.items())
         return Command(args=new_args)
 
     def __str__(self) -> str:
-        return " ".join(map(shlex.quote, self.args))
+        return " ".join(map(shlex.quote, [os.fspath(arg) for arg in self.args]))
 
     def exec(self) -> NoReturn:
         # Restore signals that the Python interpreter has called SIG_IGN on to SIG_DFL.
@@ -89,7 +95,7 @@ class Command:
         #
         _restore_signals()
 
-        os.execvp(self.args[0], self.args)
+        os.execvp(self.args[0], [os.fspath(arg) for arg in self.args])
 
     def json(self, check: bool = True) -> Any:
         return json.loads(self.out())

@@ -1,6 +1,7 @@
 """cmdlib test suite."""
 
 import traceback
+from pathlib import Path
 from textwrap import dedent
 
 import pytest
@@ -31,6 +32,11 @@ def test_run_status() -> None:
 def test_run_raises() -> None:
     with pytest.raises(CommandError):
         Cmd("false").run()
+
+
+def test_run_path_like() -> None:
+    status = Cmd("echo")(Path(".")).run()
+    assert status.success()
 
 
 def test_command_error_captures_output() -> None:
@@ -97,6 +103,11 @@ def test_command_error_format_long() -> None:
 def test_command_str_quoted() -> None:
     cmd = Cmd("echo")("some arg")
     assert str(cmd) == r"echo 'some arg'"
+
+
+def test_command_str_path_like() -> None:
+    cmd = Cmd("ls")(Path("."))
+    assert str(cmd) == "ls ."
 
 
 def test_args_chaining() -> None:
