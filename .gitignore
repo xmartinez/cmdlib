@@ -1,3 +1,4 @@
+*.egg-info
 .DS_Store
 .coverage
 .dmypy.json
@@ -5,7 +6,6 @@
 .idea
 .tox
 .vscode
-/*.egg-info
 /.mypy_report/
 /.venv/
 __pycache__
