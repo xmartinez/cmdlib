@@ -19,7 +19,9 @@ poetry.lock: pyproject.toml
 	touch $@
 
 .venv/updated: .venv/created poetry.lock
-	poetry install && touch $@
+	poetry install && \
+	scripts/fix-mypy-root-pth.sh cmdlib && \
+	touch $@
 
 .PHONY: venv
 venv: .venv/updated

@@ -29,7 +29,13 @@ import sys
 import os.path
 
 lib = os.path.expanduser("${root}/lib")
+vendors = os.path.join(lib, "poetry", "_vendor")
+current_vendors = os.path.join(
+    vendors, "py{}".format(".".join(str(v) for v in sys.version_info[:2]))
+)
+
 sys.path.insert(0, lib)
+sys.path.insert(0, current_vendors)
 
 if __name__ == "__main__":
     from poetry.console import main
