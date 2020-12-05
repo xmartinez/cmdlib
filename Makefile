@@ -34,7 +34,8 @@ check-fmt: venv
 
 .PHONY: check-types
 check-types: venv
-	poetry run mypy src tests && cat .mypy_report/linecount.txt
+	poetry run mypy src && cat .mypy_report/linecount.txt
+	poetry run mypy tests && cat .mypy_report/linecount.txt
 
 .PHONY: lint
 lint: venv
