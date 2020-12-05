@@ -89,7 +89,7 @@ class Command:
     def __str__(self) -> str:
         return " ".join(map(shlex.quote, [os.fspath(arg) for arg in self.args]))
 
-    def current_dir(self, path: PathLike) -> Command:
+    def current_dir(self, path: Optional[PathLike]) -> Command:
         self.cwd = path
         return self
 

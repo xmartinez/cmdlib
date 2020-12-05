@@ -1,5 +1,6 @@
 """cmdlib test suite."""
 
+import os
 import traceback
 from pathlib import Path
 from textwrap import dedent
@@ -21,6 +22,10 @@ def test_current_dir(tmpdir: py.path.local) -> None:
     # Add an argument after `current_dir()` to ensure that it is preserved.
     cwd = Cmd("pwd").current_dir(tmpdir)("-P").output().rstrip()
     assert cwd == tmpdir
+
+    # `None` should preserve current working directory.
+    cwd = Cmd("pwd").current_dir(None).output().rstrip()
+    assert cwd == os.getcwd()
 
 
 def test_exec() -> None:
