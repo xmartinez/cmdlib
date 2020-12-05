@@ -21,7 +21,7 @@ jobs:
     - name: Install poetry
       shell: bash
       run: |
-        scripts/install-poetry.sh $HOME/.poetry 1.0.5 linux
+        scripts/install-poetry.sh $HOME/.poetry 1.0.10 linux
         echo "$HOME/.poetry/bin" >> $GITHUB_PATH
 
     - name: Environment
