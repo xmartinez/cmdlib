@@ -12,7 +12,7 @@ from cmdlib import __version__, Cmd, CommandError, ExitStatus
 
 
 def test_version() -> None:
-    assert __version__ == "0.6.0"
+    assert __version__ == "0.7.0"
 
 
 def test_current_dir(tmpdir: py.path.local) -> None:
