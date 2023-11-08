@@ -5,7 +5,7 @@ import os
 import shlex
 import signal
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from textwrap import indent
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
@@ -85,7 +85,7 @@ class Command:
         new_args = self.args[:]
         new_args.extend(args)
         new_args.extend(_item_as_option(k, v) for k, v in kw.items())
-        return Command(args=new_args, cwd=self.cwd)
+        return replace(self, args=new_args)
 
     def __str__(self) -> str:
         return " ".join(map(shlex.quote, [os.fspath(arg) for arg in self.args]))
@@ -95,7 +95,7 @@ class Command:
         return self
 
     def env(self, **env: str) -> Command:
-        return type(self)(args=self.args, cwd=self.cwd, _env=dict(self._env, **env))
+        return replace(self, _env=dict(self._env, **env))
 
     def exec(self) -> NoReturn:
         # Restore signals that the Python interpreter has called SIG_IGN on to SIG_DFL.

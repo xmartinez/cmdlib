@@ -46,6 +46,32 @@ def test_env() -> None:
     assert env["VAR2"] == "VALUE_2"
 
 
+def test_env_args() -> None:
+    script = "\n".join(["import json, os", "print(json.dumps(dict(os.environ)))"])
+    cmd = Cmd("python")
+
+    # Modify environment.
+    cmd = cmd.env(VAR1="VALUE_1")
+
+    # Add args.
+    cmd_args = cmd("-c", script)
+    env = cmd_args.json()
+    assert env["VAR1"] == "VALUE_1"
+
+
+def test_env_cwd() -> None:
+    script = "\n".join(["import json, os", "print(json.dumps(dict(os.environ)))"])
+    cmd = Cmd("python")("-c", script)
+
+    # Modify environment.
+    cmd = cmd.env(VAR1="VALUE_1")
+
+    # Set cwd.
+    cmd_cwd = cmd.current_dir(Path("/"))
+    env = cmd_cwd.json()
+    assert env["VAR1"] == "VALUE_1"
+
+
 def test_env_does_not_mutate() -> None:
     script = "\n".join(["import json, os", "print(json.dumps(dict(os.environ)))"])
     cmd = Cmd("python")("-c", script)
