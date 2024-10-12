@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from textwrap import indent
 from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 
 if TYPE_CHECKING:
