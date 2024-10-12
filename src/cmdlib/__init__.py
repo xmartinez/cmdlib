@@ -91,8 +91,7 @@ class Command:
         return " ".join(map(shlex.quote, [os.fspath(arg) for arg in self.args]))
 
     def current_dir(self, path: Optional[PathLike]) -> Command:
-        self.cwd = path
-        return self
+        return replace(self, cwd=path)
 
     def env(self, **env: str) -> Command:
         return replace(self, _env=dict(self._env, **env))
