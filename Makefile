@@ -6,22 +6,12 @@ default: test
 ################################################################################
 # Virtual environment.
 
-poetry.lock: pyproject.toml
-	poetry lock && touch $@
+.venv/updated: poetry.lock
+	poetry install --sync && touch $@
 
-# Manually create virtual environment, to ensure that we use a recent
-# `pip` and `setuptools` version.
-#
-# See: https://github.com/python-poetry/poetry/issues/732
-.venv/created:
-	python3 -m venv .venv && \
-	.venv/bin/python -m pip install --upgrade pip setuptools && \
-	touch $@
-
-.venv/updated: .venv/created poetry.lock
-	poetry install && \
-	scripts/fix-mypy-root-pth.sh cmdlib && \
-	touch $@
+.PHONY: lock
+lock:
+	poetry lock --no-update
 
 .PHONY: venv
 venv: .venv/updated
