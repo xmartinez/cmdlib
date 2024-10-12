@@ -5,9 +5,9 @@ import os
 import shlex
 import signal
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from textwrap import indent
-from typing import TYPE_CHECKING, Any, List, NoReturn, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, NoReturn, Optional, Union
 
 __version__ = "0.7.0"
 
@@ -79,6 +79,7 @@ def _item_as_option(k: str, v: Union[bool, str]) -> str:
 class Command:
     args: List[StrPath]
     cwd: Optional[PathLike] = None
+    _env: Dict[str, str] = field(default_factory=dict)
 
     def __call__(self, *args: StrPath, **kw: Union[bool, str]) -> Command:
         new_args = self.args[:]
@@ -93,6 +94,9 @@ class Command:
         self.cwd = path
         return self
 
+    def env(self, **env: str) -> Command:
+        return type(self)(args=self.args, cwd=self.cwd, _env=dict(self._env, **env))
+
     def exec(self) -> NoReturn:
         # Restore signals that the Python interpreter has called SIG_IGN on to SIG_DFL.
         #
@@ -104,7 +108,11 @@ class Command:
 
         if self.cwd is not None:
             os.chdir(self.cwd)
-        os.execvp(self.args[0], [os.fspath(arg) for arg in self.args])
+        os.execvpe(
+            file=self.args[0],
+            args=[os.fspath(arg) for arg in self.args],
+            env=dict(os.environ, **self._env),
+        )
 
     def json(self) -> Any:
         return json.loads(self.output_bytes())
@@ -131,7 +139,10 @@ class Command:
         self, capture_output: bool = False
     ) -> subprocess.CompletedProcess[bytes]:
         return subprocess.run(
-            args=self.args, cwd=self.cwd, capture_output=capture_output
+            args=self.args,
+            cwd=self.cwd,
+            capture_output=capture_output,
+            env=dict(os.environ, **self._env),
         )
 
     def run(self) -> None:
