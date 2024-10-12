@@ -32,7 +32,7 @@ venv: .venv/updated
 
 .PHONY: check-fmt
 check-fmt: venv
-	poetry run black --check --quiet .
+	poetry run ruff format --check --quiet
 
 .PHONY: check-types
 check-types: venv
@@ -41,10 +41,10 @@ check-types: venv
 
 .PHONY: lint
 lint: venv
-	poetry run flake8 --exclude=.venv
+	poetry run ruff check --quiet
 
 .PHONY: check
-check: check-fmt check-types lint
+check: check-fmt lint check-types
 
 .PHONY: test
 test: venv
