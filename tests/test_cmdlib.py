@@ -27,6 +27,62 @@ def test_current_dir(tmp_path: Path) -> None:
     assert cwd == os.getcwd()
 
 
+def test_env() -> None:
+    script = "\n".join(["import json, os", "print(json.dumps(dict(os.environ)))"])
+    cmd = Cmd("python")("-c", script)
+
+    # Modify child environment.
+    env = cmd.env(VAR1="VALUE_1", VAR2="VALUE_2").json()
+    assert env["VAR1"] == "VALUE_1"
+    assert env["VAR2"] == "VALUE_2"
+
+    # Current process should not be modified.
+    assert "VAR1" not in os.environ
+    assert "VAR2" not in os.environ
+
+    # Chaining.
+    env = cmd.env(VAR1="VALUE_1").env(VAR2="VALUE_2").json()
+    assert env["VAR1"] == "VALUE_1"
+    assert env["VAR2"] == "VALUE_2"
+
+
+def test_env_does_not_mutate() -> None:
+    script = "\n".join(["import json, os", "print(json.dumps(dict(os.environ)))"])
+    cmd = Cmd("python")("-c", script)
+    cmd_env = cmd.env(VAR1="VALUE1")
+
+    # The env variable should only apply to the second command.
+    assert "VAR1" not in cmd.json()
+    assert "VAR1" in cmd_env.json()
+
+
+def test_env_exec() -> None:
+    script = [
+        "import os",
+        "assert os.environ['VAR1'] == 'VALUE_1'",
+    ]
+    check_cmd = Cmd("python")("-c", "\n".join(script))
+
+    # Modify child environment.
+    check_cmd = check_cmd.env(VAR1="VALUE_1")
+
+    # Exec child.
+    pid = os.fork()
+    if not pid:
+        # Child process.
+        check_cmd.exec()
+        os._exit(1)
+    else:
+        # Parent (current) process.
+        _, status = os.waitpid(pid, 0)
+
+    # Child status ok.
+    assert os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0
+
+    # Current process should not be modified.
+    assert "VAR1" not in os.environ
+
+
 def test_exec() -> None:
     script = "\n".join(["import cmdlib", "cmdlib.Cmd('echo', 'arg1', 'arg2').exec()"])
     output = Cmd("python3")("-c", script).out()
