@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cmdlib"
-version = "0.8.0"
+version = "0.8.1"
 description = ""
 authors = ["Xavier Martinez-Hidalgo <xavier@martinezhidalgo.org>"]
 

@@ -11,7 +11,7 @@ from cmdlib import __version__, Cmd, CommandError, ExitStatus
 
 
 def test_version() -> None:
-    assert __version__ == "0.8.0"
+    assert __version__ == "0.8.1"
 
 
 def test_current_dir(tmp_path: Path) -> None:
