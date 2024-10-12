@@ -27,6 +27,15 @@ def test_current_dir(tmp_path: Path) -> None:
     assert cwd == os.getcwd()
 
 
+def test_current_dir_does_not_mutate(tmp_path: Path) -> None:
+    cmd = Cmd("pwd")
+    cmd_tmp = cmd.current_dir(tmp_path)
+
+    # Setting current_dir in `cmd_tmp` should not affect `cmd`.
+    assert cmd.output().rstrip() == os.getcwd()
+    assert Path(cmd_tmp.output().rstrip()) == tmp_path
+
+
 def test_env() -> None:
     script = "\n".join(["import json, os", "print(json.dumps(dict(os.environ)))"])
     cmd = Cmd("python")("-c", script)
